@@ -4,12 +4,11 @@ COPY . /app
 COPY .env.example /app/.env
 
 RUN apt-get update && apt-get install -y \
-    curl \
     git \
+    curl \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    php \
     unzip \
     zip 
 
