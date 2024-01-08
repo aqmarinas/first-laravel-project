@@ -21,4 +21,4 @@ steps:
       - "--allow-unauthenticated"
 images:
   - "gcr.io/$PROJECT_ID/first-laravel-project:$COMMIT_SHA"
-logsBucket: "gs://antuk-buckets/logs"
+logsBucket: "gs://laravel-buckets/logs"
