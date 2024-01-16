@@ -19,6 +19,7 @@ steps:
       - "--cpu=2"
       - "--memory=2048Mi"
       - "--allow-unauthenticated"
+      - "--set-secrets=DB_HOST=db-host:latest,DB_USERNAME=db-username:latest,DB_PASSWORD=db-password:latest,DB_DATABASE=db-database:latest"
 images:
   - "gcr.io/$PROJECT_ID/first-laravel-project:$COMMIT_SHA"
 logsBucket: "gs://laravel-buckets/logs"
