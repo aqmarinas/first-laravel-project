@@ -1,7 +1,6 @@
 FROM php:8.2-cli
 
 COPY . /app
-
 COPY .env.example /app/.env
 
 WORKDIR /app
@@ -24,13 +23,10 @@ RUN cd /app && composer update
 
 RUN cd /app && php artisan key:generate
 
-COPY . /app
-
-# Expose port 8080
 EXPOSE 8080
 
-# Set execute permissions for migration.sh
-RUN chmod +x /app/migration.sh
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080
 
-# Run migrations and start the PHP built-in server
-CMD ["/app/migration.sh"]
+# RUN chmod +x /app/migration.sh
+
+# CMD ["/app/migration.sh"]
