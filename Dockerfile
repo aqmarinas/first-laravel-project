@@ -20,6 +20,6 @@ RUN cd /app && php artisan key:generate
 
 WORKDIR /app
 
-CMD php artisan serve --host=0.0.0.0 --port=8080 && php artisan migrate
+CMD php artisan migrate && php artisan serve --host=0.0.0.0 --port=8080
 
 EXPOSE 8080
