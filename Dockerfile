@@ -2,6 +2,8 @@ FROM php:8.2-cli
 
 COPY . /app
 
+COPY .env.example /app/.env
+
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
