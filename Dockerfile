@@ -20,6 +20,8 @@ RUN cd /app && php artisan key:generate
 
 WORKDIR /app
 
+ENV APP_NAME=Laravel
+
 EXPOSE 8080
 
 CMD php artisan migrate && php artisan serve --host=0.0.0.0 --port=8080
