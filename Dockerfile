@@ -1,27 +1,55 @@
 FROM php:8.2-cli
 
-COPY . /app
-COPY .env.example /app/.env
+# Copy composer.lock and composer.json into the working directory
+COPY composer.lock composer.json /var/www/html/
 
+# Set working directory
+WORKDIR /var/www/html/
+
+# Install dependencies for the operating system software
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
+    build-essential \
     libpng-dev \
-    libonig-dev \
-    libxml2-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    locales \
+    zip \
+    jpegoptim optipng pngquant gifsicle \
+    vim \
+    libzip-dev \
     unzip \
-    zip 
+    git \
+    libonig-dev \
+    curl
 
-RUN curl -sS https://getcomposer.org/installer | php -- \
-    --install-dir=/usr/bin --filename=composer
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN cd /app && composer update
-RUN cd /app && php artisan key:generate
+# Install extensions for php
+RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install gd
 
-WORKDIR /app
+# Install composer (php package manager)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer install --no-scripts
 
+# Copy existing application directory contents to the working directory
+COPY . /var/www/html
+
+# Assign permissions of the working directory to the www-data user
+RUN chown -R www-data:www-data \
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache
+
+ENV DB_CONNECTION=mysql
 ENV APP_NAME=Laravel
 
+# Expose port 8080
 EXPOSE 8080
 
-CMD php artisan migrate && php artisan serve --host=0.0.0.0 --port=8080
+# Set execute permissions for migration.sh
+RUN chmod +x /var/www/html/migration.sh
+
+# Run migrations and start the PHP built-in server
+CMD ["/var/www/html/migration.sh"]
