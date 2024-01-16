@@ -1,55 +1,30 @@
 FROM php:8.2-cli
 
-# Copy composer.lock and composer.json into the working directory
-COPY composer.lock composer.json /var/www/html/
+COPY . /app
 
-# Set working directory
-WORKDIR /var/www/html/
+WORKDIR /app
 
-# Install dependencies for the operating system software
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim \
-    libzip-dev \
-    unzip \
     git \
+    curl \
+    libpng-dev \
     libonig-dev \
-    curl
+    libxml2-dev \
+    unzip \
+    zip 
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN docker-php-ext-install pdo_mysql 
 
-# Install extensions for php
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install gd
-
-# Install composer (php package manager)
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN composer install --no-scripts
 
-# Copy existing application directory contents to the working directory
-COPY . /var/www/html
-
-# Assign permissions of the working directory to the www-data user
-RUN chown -R www-data:www-data \
-    /var/www/html/storage \
-    /var/www/html/bootstrap/cache
-
-ENV DB_CONNECTION=mysql
-ENV APP_NAME=Laravel
+COPY . /app
 
 # Expose port 8080
 EXPOSE 8080
 
 # Set execute permissions for migration.sh
-RUN chmod +x /var/www/html/migration.sh
+RUN chmod +x /app/migration.sh
 
 # Run migrations and start the PHP built-in server
-CMD ["/var/www/html/migration.sh"]
+CMD ["/app/migration.sh"]
