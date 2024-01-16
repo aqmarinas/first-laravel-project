@@ -1,7 +1,7 @@
 FROM php:8.2-cli
 
 COPY . /app
-COPY .env.example /app/.env
+# COPY .env.example /app/.env
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -20,6 +20,6 @@ RUN cd /app && php artisan key:generate
 
 WORKDIR /app
 
-ENV PORT=8080
+EXPOSE 8080
 
 CMD php artisan migrate && php artisan serve --host=0.0.0.0 --port=8080
